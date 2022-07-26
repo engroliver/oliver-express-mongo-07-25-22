@@ -125,8 +125,59 @@ async function run(){
         })
     })
 
+    // Task 6: Create an endpoint to add a review to a recipe Endpoint recipes/<recipeId>/reviews 
+    app.post('/recipes/:recipeId/reviews', async function (req,res){
+        const results = await db.collection('dwad-recipes').updateOne({
+            _id: ObjectId(req.params.recipeId)
+        }, {
+            '$push': {
+                'reviews': {
+                    '_id': ObjectId(),
+                    'email_add':req.body.email_add,  
+                    'content': req.body.content,
+                    'rating': req.body.rating
+                }
+            }
+        })
+        res.json({
+            'message': 'Review has been added successfully',
+            'results': results
+        })
 
 
+
+    })
+
+    // Task 7: Get recipe details
+
+    app.get('/recipes/:recipeId', async function (req, res) {
+        const recipes = await db.collection('dwad-recipes').findOne({
+            _id: ObjectId(req.params.recipeId)
+        });
+        res.json(recipes);
+    })
+
+
+
+// Task 8: Update a review for a recipe End Point recipes/<recipeId>/reviews/<reviewId>
+
+    app.put('/recipes/:recipeId/reviews/:reviewId', async function (req, res) {
+        const results = await db.collection('dwad-recipes').updateOne({
+            'reviews._id': ObjectId(req.params.reviewId)
+        }, {
+            '$set': {
+                'reviews.$.email_add': req.body.email_add,
+                'reviews.$.content': req.body.content,
+                'reviews.$.rating': req.body.rating
+                
+            }
+        })
+        res.json({
+            'message': 'review updated',
+            'results': results
+        })
+
+    })
 
 
 }
